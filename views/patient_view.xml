@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--TREE-->
+    <record model="ir.ui.view" id="view_hospital_patient_tree">
+        <field name="name">hospital.patient.tree</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <tree>
+                <header>
+                    <button name="action_done" string="Mark As Done" class="btn-primary"
+                        confirm="are you sure that you want to set this as done?"
+                        type="object"/>
+                </header>
+                <field name="patient_name" string="Patient Name"/>
+                <field name="ref" optional="show"/>
+                <field name="date_of_birth" optional="show"/>
+                <field name="age" optional="show"/>
+                <field name="gender" optional="show"/>
+                <field name="state" optional="show"/>
+            </tree>
+        </field>
+    </record>
+    <!--END TREE-->
+    <!--FORM-->
+    <record model="ir.ui.view" id="view_hospital_patient_form">
+        <field name="name">hospital.patient.form</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+
+                    <widget name="web_ribbon" title="Archived" color="bg-danger"
+                            attrs="{'invisible': [('active', '=',True)]}"/>
+                    <header>
+                        <!--buttons -->
+                        <button id="make_appointment" name="%(om_hospital.create_appointment_wizard_action)d" string="make an appointment"
+                                class="btn-primary"
+                                states="done"
+                                type="action"
+                                />
+                        <button id="action_confirm" name="action_confirm" string="confirm" class="btn-primary"
+                                states="draft"
+                                type="object"
+                                confirm="are you sure that you want to confirm?"/>
+                        <button id="action_done" name="action_done" string="Mark As Done" class="btn-primary"
+                                states="confirm"
+                                confirm="are you sure that you want to set this as done?"
+                                type="object"/>
+                        <button id="action_draft" name="action_draft" string="Set As a Draft" class="btn-primary"
+                                states="cancel"
+                                type="object"/>
+                        <button id="action_cancel" name="action_cancel" string="Cancel"
+                                states="draft,confirm,done"
+                                type="object"/>
+
+                        <!--options={clickable='1'}/> -->
+                        <!--end buttons-->
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done"/>
+                    </header>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="patient_name" attrs="{'readonly': [('state','=','done')]}"/>
+                        </h1>
+                    </div>
+                    <field name="image" widget="image" class="oe_avatar"/>
+                    <group>
+                        <group>
+                            <field name="date_of_birth" attrs="{'readonly': [('state','=','done')]}"/>
+                            <field name="age"/>
+                        </group>
+                        <group>
+                            <field name="ref"/>
+                            <field name="gender" invisible="context.get('hide_gender')" attrs="{'readonly': [('state','=','done')]}"/>
+                            <field name="active" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Appointments" name="appointment">
+                            <field name="appointment_ids" readonly="1">
+                                <tree>
+                                    <field name="patient_id"/>
+                                    <field name="doctor"/>
+                                    <field name="appointment_time"/>
+                                    <field name="booking_date"/>
+                                    <field name="gender"/>
+                                </tree>
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="patient_id"/>
+                                                <field name="gender"/>
+                                            </group>
+                                            <group>
+                                                <field name="doctor"/>
+                                                <field name="appointment_time"/>
+                                                <field name="booking_date"/>
+                                            </group>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" groups="base.group_user"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+    <!--END FORM-->
+    <!--SEARCH-->
+    <record model="ir.ui.view" id="view_hospital_patient_search">
+        <field name="name">hospital.patient.search</field>
+        <field name="model">hospital.patient</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="patient_name" string="Patient Name"
+                       filter_domain="['|', ('patient_name','ilike',self), ('ref','ilike',self)]"/>
+                <field name="ref"/>
+                <field name="age"/>
+                <field name="gender"/>
+                <filter name="filter_male" string="Male" domain="[('gender','=','male')]"/>
+                <filter name="filter_female" string="Female" domain="[('gender','=','female')]"/>
+                <!--                <separator/>-->
+                <!--                <filter name="filter_kids" string="Kids" domain="[('age','&lt;=',5)]"/>-->
+                <separator/>
+                <filter name="filter_archived" string="Archived" domain="[('active','=',False)]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Gender" name="group_by_gender" context="{'group_by':'gender'}"/>
+                </group>
+                <searchpanel>
+                    <field name="gender" string="Gender" enable_counters="1"/>
+                </searchpanel>
+            </search>
+
+        </field>
+    </record>
+    <!--END SEARCH-->
+    <record id="action_hospital_patient" model="ir.actions.act_window">
+        <field name="name">Patients</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hospital.patient</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{ }</field>
+        <!--         <field name="context">{ 'search_default_group_by_gender' : 1 }</field>-->
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first patient!
+            </p>
+        </field>
+    </record>
+
+    <!--MENU-->
+    <menuitem id="menu_patient"
+              name="Patient"
+              action="action_hospital_patient"
+              parent="menu_patient_master"
+              sequence="0"
+    />
+    <!--END MENU-->
+
+</odoo>

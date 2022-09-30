@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_hospital_root"
+        name="Hospital"
+        web_icon="om_hospital,static/description/icon.png"
+        sequence="1"
+        />
+    <menuitem id="menu_patient_master"
+        name="Patient_Details"
+        parent="menu_hospital_root"
+        sequence="0"
+        />
+    <menuitem id="menu_doctors_master"
+        name="Doctors"
+        parent="menu_hospital_root"
+        sequence="3"
+        />
+    <menuitem id="menu_appointments_master"
+        name="Appointments"
+        parent="menu_hospital_root"
+        sequence="2"
+        />
+    <menuitem id="menu_reports_master"
+       name="Reports"
+       parent="menu_hospital_root"
+       sequence="4"
+       />
+</odoo>
